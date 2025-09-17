@@ -1,0 +1,78 @@
+<h1 class="mb-5 text-primary text-center" style="font-size:2.5rem;">📚 Mental Health Resources & Relaxation</h1>
+
+<div class="row g-4 justify-content-center">
+
+  <!-- Resource Cards -->
+  <% resources.forEach(resource => { %>
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <a href="<%= resource.link %>" target="_blank" class="card h-100 shadow-sm p-3 text-decoration-none text-dark hover-card">
+        <div class="icon-wrapper mb-3">
+          <span class="icon">📖</span>
+        </div>
+        <h6 class="text-center fw-bold"><%= resource.title %></h6>
+        <p class="text-center text-muted small mt-2">Click to open</p>
+      </a>
+    </div>
+  <% }) %>
+
+  <!-- Relaxation Game Card -->
+  <div class="col-sm-6 col-md-4 col-lg-3">
+    <a href="/game" class="card h-100 shadow-sm p-3 text-decoration-none text-dark hover-card">
+      <div class="icon-wrapper game-icon mb-3">
+        <span class="icon">🎮</span>
+      </div>
+      <h6 class="text-center fw-bold">Relaxing Game</h6>
+      <p class="text-center text-muted small mt-2">Click to play and relax</p>
+    </a>
+  </div>
+
+</div>
+
+<style>
+/* Card hover effect */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  border-radius: 16px;
+  background: #ffffff;
+}
+.hover-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+  background: #f9f9ff;
+}
+
+/* Icon wrapper styling */
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  background: #e8f0fe;
+  border-radius: 12px;
+  transition: background 0.3s ease;
+}
+.icon-wrapper .icon {
+  font-size: 3rem;
+}
+.hover-card:hover .icon-wrapper {
+  background: #d0e2ff;
+}
+
+/* Game card special color */
+.game-icon {
+  background: #d1e7dd;
+}
+.hover-card:hover .game-icon {
+  background: #bde3ca;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  .icon-wrapper {
+    height: 100px;
+  }
+}
+</style>

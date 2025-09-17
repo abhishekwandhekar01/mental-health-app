@@ -1,0 +1,257 @@
+<div class="quiz-container">
+  <div class="quiz-header">
+    <h2>📝 Mental Health Self-Assessment</h2>
+    <p>Select a quiz to begin</p>
+    <div class="quiz-selector">
+      <button class="quiz-btn active" data-quiz="phq5">PHQ-5</button>
+      <button class="quiz-btn" data-quiz="phq9">PHQ-9</button>
+      <button class="quiz-btn" data-quiz="gad7">GAD-7</button>
+    </div>
+  </div>
+
+  <div id="progress-bar">
+    <div id="progress"></div>
+  </div>
+
+  <div id="quiz-box" class="quiz-box"></div>
+
+  <div class="quiz-footer">
+    <button id="next-btn" disabled>Next</button>
+  </div>
+</div>
+
+<style>
+/* Container */
+.quiz-container {
+  max-width: 650px;
+  margin: 40px auto;
+  background: #f7f9fc;
+  border-radius: 14px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Header */
+.quiz-header {
+  background: #007bff;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+.quiz-header h2 { margin: 0 0 5px; }
+.quiz-header p { font-size: 0.9rem; margin-bottom: 10px; }
+
+.quiz-selector {
+  margin-top: 10px;
+}
+.quiz-selector button {
+  padding: 8px 15px;
+  margin: 0 5px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.quiz-selector button.active, .quiz-selector button:hover {
+  background: #fff;
+  color: #007bff;
+}
+
+/* Progress bar */
+#progress-bar {
+  width: 100%;
+  background: #e0e0e0;
+  height: 8px;
+}
+#progress {
+  width: 0;
+  height: 100%;
+  background: #007bff;
+  transition: 0.3s;
+}
+
+/* Quiz box */
+.quiz-box {
+  padding: 25px 20px;
+  min-height: 160px;
+}
+.question {
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+}
+.option {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.option:hover {
+  background: #f1f1f1;
+}
+.option.selected {
+  background: #007bff;
+  color: #fff;
+  border-color: #0056b3;
+}
+
+/* Footer */
+.quiz-footer {
+  padding: 15px 20px;
+  text-align: right;
+  background: #fff;
+  border-top: 1px solid #ddd;
+}
+#next-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  background: #007bff;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+#next-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+</style>
+
+<script>
+// Quiz Data
+const quizzes = {
+  phq5: [
+    "Little interest or pleasure in doing things?",
+    "Feeling down, depressed, or hopeless?",
+    "Trouble sleeping or sleeping too much?",
+    "Feeling tired or having little energy?",
+    "Poor appetite or overeating?"
+  ],
+  phq9: [
+    "Little interest or pleasure in doing things?",
+    "Feeling down, depressed, or hopeless?",
+    "Trouble falling or staying asleep, or sleeping too much?",
+    "Feeling tired or having little energy?",
+    "Poor appetite or overeating?",
+    "Feeling bad about yourself—or that you are a failure?",
+    "Trouble concentrating on things?",
+    "Moving or speaking so slowly that other people could notice—or being fidgety?",
+    "Thoughts that you would be better off dead or hurting yourself?"
+  ],
+  gad7: [
+    "Feeling nervous, anxious, or on edge?",
+    "Not being able to stop or control worrying?",
+    "Worrying too much about different things?",
+    "Trouble relaxing?",
+    "Being so restless that it’s hard to sit still?",
+    "Becoming easily annoyed or irritable?",
+    "Feeling afraid as if something awful might happen?"
+  ]
+};
+
+const options = ["Not at all","Several days","More than half the days","Nearly every day"];
+let currentQuiz = "phq5";
+let currentQ = 0;
+let score = [];
+
+const quizBox = document.getElementById("quiz-box");
+const nextBtn = document.getElementById("next-btn");
+const progress = document.getElementById("progress");
+const quizButtons = document.querySelectorAll(".quiz-btn");
+
+// Quiz selection
+quizButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    quizButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentQuiz = btn.dataset.quiz;
+    currentQ = 0;
+    score = [];
+    nextBtn.style.display = "inline-block";
+    loadQuestion();
+  });
+});
+
+// Load question
+function loadQuestion() {
+  const qData = quizzes[currentQuiz][currentQ];
+  quizBox.innerHTML = `
+    <div class="question">${currentQ+1}. ${qData}</div>
+    ${options.map((opt,i)=>`<div class="option" data-value="${i}">${opt}</div>`).join("")}
+  `;
+
+  document.querySelectorAll(".option").forEach(opt => {
+    opt.addEventListener("click", () => {
+      document.querySelectorAll(".option").forEach(o=>o.classList.remove("selected"));
+      opt.classList.add("selected");
+      nextBtn.disabled = false;
+    });
+  });
+
+  nextBtn.disabled = true;
+  updateProgress();
+}
+
+// Progress bar
+function updateProgress() {
+  const total = quizzes[currentQuiz].length;
+  progress.style.width = `${((currentQ)/total)*100}%`;
+}
+
+// Next button click
+nextBtn.addEventListener("click", () => {
+  const selected = document.querySelector(".option.selected");
+  if(!selected) return;
+  score.push(parseInt(selected.dataset.value));
+  currentQ++;
+  if(currentQ < quizzes[currentQuiz].length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+});
+
+// Show result
+function showResult() {
+  const totalScore = score.reduce((a,b)=>a+b,0);
+  let result = "";
+  let helpline = `<p style="color:red; font-weight:bold;">🚨 If in crisis, call: <a href="tel:18005990019">1800-599-0019 (KIRAN Helpline, India)</a></p>`;
+
+  if(currentQuiz==="phq5"){
+    if(totalScore<=4) result="Minimal depression";
+    else if(totalScore<=9) result="Mild depression";
+    else if(totalScore<=14) result="Moderate depression";
+    else result="Severe depression";
+  } else if(currentQuiz==="phq9"){
+    if(totalScore<=4) result="Minimal depression";
+    else if(totalScore<=9) result="Mild depression";
+    else if(totalScore<=14) result="Moderate depression";
+    else if(totalScore<=19) result="Moderately severe depression";
+    else result="Severe depression";
+  } else if(currentQuiz==="gad7"){
+    if(totalScore<=4) result="Minimal anxiety";
+    else if(totalScore<=9) result="Mild anxiety";
+    else if(totalScore<=14) result="Moderate anxiety";
+    else result="Severe anxiety";
+  }
+
+  quizBox.innerHTML = `
+    <h3>✅ Quiz Complete!</h3>
+    <p>Your score: <b>${totalScore}</b></p>
+    <p>Result: <b>${result}</b></p>
+    ${helpline}
+  `;
+  nextBtn.style.display = "none";
+  progress.style.width = "100%";
+}
+
+// Initial load
+loadQuestion();
+</script>

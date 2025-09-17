@@ -1,0 +1,76 @@
+
+<div class="chat-wrapper">
+  <div class="chat-header">
+    <h2>💬 Mental Health Support</h2>
+    <p>Friendly support & guidance. Warnings appear in red.</p>
+  </div>
+
+  <div id="messages" class="chat-messages"></div>
+
+  <form id="chat-form" class="chat-input">
+    <input type="text" id="message" placeholder="Type a message..." autocomplete="off" required>
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<style>
+  .chat-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    background: #f7f9fc;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .chat-header {
+    padding: 15px;
+    background: #007bff;
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  .chat-header h2 { margin: 0; font-size: 1.5rem; }
+  .chat-header p { font-size: 0.85rem; margin-top: 5px; }
+  .chat-messages {
+    flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+  }
+  .message { max-width: 75%; padding: 10px 15px; border-radius: 20px; word-wrap: break-word; font-size: 0.95rem; }
+  .user-message { align-self: flex-end; background: #d1e7dd; color: #0f5132; }
+  .bot-message { align-self: flex-start; background: #e2e3e5; color: #41464b; }
+  .alert-message { background: #f8d7da !important; color: #842029; font-weight: bold; }
+  .chat-input { display: flex; border-top: 1px solid #ddd; padding: 10px; background: #fff; }
+  .chat-input input { flex: 1; padding: 12px 15px; border-radius: 25px; border: 1px solid #ccc; margin-right: 10px; }
+  .chat-input button { padding: 0 20px; border: none; border-radius: 25px; background: #007bff; color: white; font-weight: bold; }
+  .chat-input button:hover { background: #0056b3; }
+</style>
+
+<script>
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("message");
+  const messages = document.getElementById("messages");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const userMsg = input.value.trim();
+    if (!userMsg) return;
+
+    messages.innerHTML += `<div class="message user-message">${userMsg}</div>`;
+    input.value = "";
+
+    const res = await fetch("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userMsg }),
+    });
+
+    const data = await res.json();
+
+    if (data.alert) {
+      messages.innerHTML += `<div class="message bot-message alert-message">${data.reply}</div>`;
+    } else {
+      messages.innerHTML += `<div class="message bot-message">${data.reply}</div>`;
+    }
+
+    messages.scrollTop = messages.scrollHeight;
+  });
+</script>

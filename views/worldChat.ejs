@@ -1,0 +1,30 @@
+<h3>Anonymous Chat - Ticket <%= ticketId %></h3>
+<div id="messages" style="height:300px;overflow-y:auto;border:1px solid #ccc;padding:10px;"></div>
+<input type="text" id="msgInput" placeholder="Type something...">
+<button id="sendBtn">Send</button>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const msgInput = document.getElementById("msgInput");
+  const sendBtn = document.getElementById("sendBtn");
+  const messages = document.getElementById("messages");
+
+  // Join room by ticketId
+  socket.emit("joinRoom", "<%= ticketId %>");
+
+  sendBtn.addEventListener("click", () => {
+    const msg = msgInput.value.trim();
+    if(!msg) return;
+    socket.emit("chatMessage", { room: "<%= ticketId %>", message: msg });
+    msgInput.value = "";
+  });
+
+  socket.on("chatMessage", (data) => {
+    const div = document.createElement("div");
+    div.textContent = data;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  });
+</script>

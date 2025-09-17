@@ -1,0 +1,39 @@
+<h1 class="mb-4 text-primary text-center"><%= ticket.title %></h1>
+
+<div class="chat-wrapper">
+  <div id="messages" class="chat-messages mb-3" style="height:300px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:12px;"></div>
+  <form id="chat-form" class="d-flex gap-2">
+    <input type="text" id="message" class="form-control" placeholder="Type a message..." autocomplete="off" required>
+    <button type="submit" class="btn btn-primary">Send</button>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("message");
+  const messages = document.getElementById("messages");
+
+  const crisisKeywords = ["suicide", "kill", "death", "die", "self-harm"];
+  const crisisNumber = "📞 If you are in crisis, call: 123-456-7890";
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const msg = input.value.trim();
+    if(!msg) return;
+
+    // Show user message
+    messages.innerHTML += `<div class="p-2 mb-2 bg-light rounded">You: ${msg}</div>`;
+
+    // Check for crisis keywords
+    const isCrisis = crisisKeywords.some(word => msg.toLowerCase().includes(word));
+    if(isCrisis){
+      messages.innerHTML += `<div class="p-2 mb-2 rounded" style="background:#f8d7da; color:#842029; font-weight:bold;">⚠️ ${crisisNumber}</div>`;
+    } else {
+      // Bot response (just a friendly placeholder)
+      messages.innerHTML += `<div class="p-2 mb-2 bg-info text-white rounded">💬 Support: I'm here for you!</div>`;
+    }
+
+    input.value = "";
+    messages.scrollTop = messages.scrollHeight;
+  });
+</script>
